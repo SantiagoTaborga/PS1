@@ -1,19 +1,8 @@
----
-title: "Problem Set 1"
-author: "Santiago Taborga"
-date: '2025-01-29'
-output: pdf_document
----
+# Problem Set 1
+# Santiago Taborga
+# 2025-01-29
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = FALSE, 
-  eval = TRUE,
-  fig.align = 'center', 
-  message = FALSE,
-  warning = FALSE
-)
-
+# Setup
 library(tidyverse)
 library(knitr)
 library(haven)
@@ -22,20 +11,12 @@ library(lfe)
 library(dplyr)
 library(tidyr)
 
-madagascar <- read_spss('Madagascar_Round9.sav') 
-
-madagascar <-
-  madagascar %>%
+madagascar <- read_spss('Madagascar_Round9.sav') %>%
   select(DATEINTR, Q1, Q2, Q100, Q101, Q78A, Q78B) %>%
   mutate(Per = 1 / nrow(madagascar) *100)
 
-```
+# 2. Describe respondents -----
 
-1. I chose the country of Madagascar. There are 1200 respondents and the interviews were conducted between `r min(madagascar$DATEINTR)` and `r max(madagascar$DATEINTR)`.
-
-1. Respondents have a broad set of backgrounds. There were a total of `r nrow(madagascar)` respondents. People's age ranges from `r min(madagascar$Q1)` to `r max(madagascar$Q1)` years old, with an mean age of `r round(mean(madagascar$Q1), 2)` and a median age of `r median(madagascar$Q1)`. There are `r sum(madagascar$Q100 == 1)` men and `r sum(madagascar$Q100 == 2)` women. `r round((sum(madagascar$Q2 == 420) / nrow(madagascar) * 100), 2)`% of people speak Malagasy officiel, `r round((sum(madagascar$Q2 == 421) / nrow(madagascar) * 100), 2)`% of people speak Malagasy avec spécificité régionale, and `r round((sum(madagascar$Q2 == 9995) / nrow(madagascar) * 100), 2)`% of people speak another language.
-
-```{r}
 tab1 <- 
   madagascar %>%
   select(Q2, Q100, Q101, Per) %>%
@@ -53,10 +34,8 @@ tab1 <-
                            (name == "Language" & value == 420) ~ "Malagasy officiel",
                            (name == "Language" & value == 421) ~ "Malagasy avec spécificité régionale",
                            (name == "Language" & value == 9995) ~ "Other"))
+  
 colnames(tab1)[which(names(tab1) == "value")] <- "Value" 
 colnames(tab1)[which(names(tab1) == "name")] <- "Variable"
 
-tab1 <- tab1 %>% kable()
-tab1
-```
-
+ 
