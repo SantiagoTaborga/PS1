@@ -26,16 +26,16 @@ madagascar <- read_spss('Madagascar_Round9.sav')
 
 madagascar <-
   madagascar %>%
-  select(DATEINTR, Q1, Q2, Q100, Q101, Q78A, Q78B) %>%
+    select(DATEINTR, Q1, Q2, Q100, Q101, Q78A, Q78B) %>%
   mutate(Per = 1 / nrow(madagascar) *100)
 
 ```
 
 1. I chose the country of Madagascar. There are 1200 respondents and the interviews were conducted between `r min(madagascar$DATEINTR)` and `r max(madagascar$DATEINTR)`.
 
-1. Respondents have a broad set of backgrounds. There were a total of `r nrow(madagascar)` respondents. People's age ranges from `r min(madagascar$Q1)` to `r max(madagascar$Q1)` years old, with an mean age of `r round(mean(madagascar$Q1), 2)` and a median age of `r median(madagascar$Q1)`. There are `r sum(madagascar$Q100 == 1)` men and `r sum(madagascar$Q100 == 2)` women. `r round((sum(madagascar$Q2 == 420) / nrow(madagascar) * 100), 2)`% of people speak Malagasy officiel, `r round((sum(madagascar$Q2 == 421) / nrow(madagascar) * 100), 2)`% of people speak Malagasy avec spécificité régionale, and `r round((sum(madagascar$Q2 == 9995) / nrow(madagascar) * 100), 2)`% of people speak another language.
+2. Respondents have a broad set of backgrounds. There were a total of `r nrow(madagascar)` respondents. People's age ranges from `r min(madagascar$Q1)` to `r max(madagascar$Q1)` years old, with an mean age of `r round(mean(madagascar$Q1), 2)` and a median age of `r median(madagascar$Q1)`. There are `r sum(madagascar$Q100 == 1)` men and `r sum(madagascar$Q100 == 2)` women. `r round((sum(madagascar$Q2 == 420) / nrow(madagascar) * 100), 2)`% of people speak Malagasy officiel, `r round((sum(madagascar$Q2 == 421) / nrow(madagascar) * 100), 2)`% of people speak Malagasy avec spécificité régionale, and `r round((sum(madagascar$Q2 == 9995) / nrow(madagascar) * 100), 2)`% of people speak another language. `r round((sum(madagascar$Q101 == 1) / nrow(madagascar) * 100), 2)`% of people are Black/African, `r round((sum(madagascar$Q101 == 2) / nrow(madagascar) * 100), 2)`% of people are White/European, and `r round((sum(madagascar$Q101 == 3) / nrow(madagascar) *100), 2)`% of people are Coloured/Mixed Race.
 
-```{r}
+```{r, fig.cap='Descriptive Stats'}
 tab1 <- 
   madagascar %>%
   select(Q2, Q100, Q101, Per) %>%
@@ -56,7 +56,70 @@ tab1 <-
 colnames(tab1)[which(names(tab1) == "value")] <- "Value" 
 colnames(tab1)[which(names(tab1) == "name")] <- "Variable"
 
-tab1 <- tab1 %>% kable()
+tab1 <- tab1 %>% kable(caption = "Descriptive Stats")
 tab1
 ```
 
+3. 
+```{r, fig.cap='Political and Economic Influence: China'}
+tab2 <- 
+  madagascar %>%
+  count(Q78A, name = "Number") %>%
+  mutate(Percent = round((100 * Number/sum(Number)), 2),
+         Q78A = case_when(Q78A == 1 ~ "Very negative",
+                          Q78A == 2 ~ "Somewhat negative",
+                          Q78A == 3 ~ "Neither positive nor negative",
+                          Q78A == 4 ~ "Somewhat positive",
+                          Q78A == 5 ~ "Very positive",
+                          Q78A == 8 ~ "Refused",
+                          Q78A == 9 ~ "Don't know",
+                          Q78A == -1 ~ "Missing"))
+
+colnames(tab2)[which(names(tab2) == "Q78A")] <- "Influence"
+
+```
+The economic and political influence of China in Madagascar is most often seen as "`r tab2$Influence[tab2$Percent == max(tab2$Percent)]`". The numbers show that `r tab2$Percent[tab2$Influence == "Very negative"]`% of people found it to be very negative, `r tab2$Percent[tab2$Influence == "Somewhat negative"]`% somewhat negative, `r tab2$Percent[tab2$Influence == "Neither positive nor negative"]`% neither positive nor negative, `r tab2$Percent[tab2$Influence == "Somewhat positive"]`% somewhat positive, and `r tab2$Percent[tab2$Influence == "Very positive"]`% very positive.
+
+```{r, fig.cap='Table 2'}
+tab2 <- kable(tab2, caption = "Political and Economic Influence: China")
+tab2
+```
+
+4. 
+```{r, fig.cap='Political and Economic Influence: United States'}
+tab2 <- 
+  madagascar %>%
+  count(Q78B, name = "Number") %>%
+  mutate(Percent = round((100 * Number/sum(Number)), 2),
+         Q78B = case_when(Q78B == 1 ~ "Very negative",
+                          Q78B == 2 ~ "Somewhat negative",
+                          Q78B == 3 ~ "Neither positive nor negative",
+                          Q78B == 4 ~ "Somewhat positive",
+                          Q78B == 5 ~ "Very positive",
+                          Q78B == 8 ~ "Refused",
+                          Q78B == 9 ~ "Don't know",
+                          Q78B == -1 ~ "Missing"))
+
+colnames(tab2)[which(names(tab2) == "Q78B")] <- "Influence"
+
+```
+The economic and political influence of China in Madagascar is most often seen as "`r tab2$Influence[tab2$Percent == max(tab2$Percent)]`". The numbers show that `r tab2$Percent[tab2$Influence == "Very negative"]`% of people found it to be very negative, `r tab2$Percent[tab2$Influence == "Somewhat negative"]`% somewhat negative, `r tab2$Percent[tab2$Influence == "Neither positive nor negative"]`% neither positive nor negative, `r tab2$Percent[tab2$Influence == "Somewhat positive"]`% somewhat positive, and `r tab2$Percent[tab2$Influence == "Very positive"]`% very positive.
+
+```{r, fig.cap='Table 3'}
+tab2 <- kable(tab2, caption = "Political and Economic Influence: United States")
+tab2
+```
+
+5. The t-test below is equal to -11.387. With 5% significance for a two-tailed t-test, I reject the null (|t| = 11.387 > 1.96). People view the economic and political influence of China significantly more negatively than the economic and political influence of the United States.
+
+```{r, fig.cap="t-test"}
+madagascar <-
+  madagascar %>%
+  mutate(
+    across(
+      Q78A:Q78B,
+      ~ if_else(.x %in% 1:5, .x, NA)
+      )
+  )
+t.test(madagascar$Q78A, madagascar$Q78B, paired = TRUE)
+```
