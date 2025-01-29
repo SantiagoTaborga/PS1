@@ -7,7 +7,7 @@ output: pdf_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(
-  echo = FALSE, 
+  echo = TRUE, 
   eval = TRUE,
   fig.align = 'center', 
   message = FALSE,
