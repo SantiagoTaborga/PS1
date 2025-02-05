@@ -56,8 +56,8 @@ tab1 <-
 colnames(tab1)[which(names(tab1) == "value")] <- "Value" 
 colnames(tab1)[which(names(tab1) == "name")] <- "Variable"
 
-tab1 <- tab1 %>% kable(caption = "Descriptive Stats")
-tab1
+tab1 %>% kable(caption = "Descriptive Stats")
+
 ```
 
 3. 
