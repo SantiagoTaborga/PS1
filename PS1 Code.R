@@ -40,6 +40,10 @@ colnames(tab1)[which(names(tab1) == "value")] <- "Value"
 colnames(tab1)[which(names(tab1) == "name")] <- "Variable"
 tab1
 
+# Another way of showing labels instead of numbers
+df %>% count(as_factor(var))
+
+
 # 3. China Attitudes -----
 ## Creating the new data
 tab2 <- 
